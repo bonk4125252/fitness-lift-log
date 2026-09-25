@@ -181,8 +181,9 @@ $('#complete-form').addEventListener('submit',event=>{
 function renderCalendar(){
   const year=calendarCursor.getFullYear();const month=calendarCursor.getMonth();
   calendarPage.innerHTML='';
-  const head=document.createElement('div');head.className='calendar-head';head.innerHTML=`<button class="calendar-arrow" id="prev-month" type="button" aria-label="上個月">‹</button><h2>${year} 年 ${month+1} 月</h2><button class="calendar-arrow" id="next-month" type="button" aria-label="下個月">›</button>`;calendarPage.append(head);
+  const toolbar=document.createElement('div');toolbar.className='calendar-toolbar';toolbar.innerHTML=`<div class="calendar-head"><button class="calendar-arrow" id="prev-month" type="button" aria-label="上個月">‹</button><h2>${year} 年 ${month+1} 月</h2><button class="calendar-arrow" id="next-month" type="button" aria-label="下個月">›</button></div><div class="backup-actions"><button id="export-backup" type="button">匯出備份</button><button id="import-backup" type="button">匯入備份</button><input id="backup-file" type="file" accept=".json,application/json" hidden /></div>`;calendarPage.append(toolbar);
   $('#prev-month').onclick=()=>{calendarCursor=new Date(year,month-1,1);renderCalendar()};$('#next-month').onclick=()=>{calendarCursor=new Date(year,month+1,1);renderCalendar()};
+  $('#export-backup').onclick=exportBackup;$('#import-backup').onclick=()=>$('#backup-file').click();$('#backup-file').onchange=event=>importBackup(event.target.files[0]);
   const grid=document.createElement('div');grid.className='calendar-grid';['日','一','二','三','四','五','六'].forEach(text=>{const label=document.createElement('div');label.className='weekday';label.textContent=text;grid.append(label)});
   const firstWeekday=new Date(year,month,1).getDay();const days=new Date(year,month+1,0).getDate();
   for(let i=0;i<firstWeekday;i++){const blank=document.createElement('div');blank.className='calendar-day blank';grid.append(blank)}
@@ -203,6 +204,27 @@ function renderCalendarDetail(date){
     detail.append(session);
   });
   return detail;
+}
+
+function exportBackup(){
+  const payload={version:1,exportedAt:new Date().toISOString(),plan,calendarRecords};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;link.download=`lift-log-backup-${localDateKey(new Date())}.json`;document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+async function importBackup(file){
+  if(!file)return;
+  try{
+    const payload=JSON.parse(await file.text());
+    const validPlan=Array.isArray(payload.plan)&&payload.plan.length>0&&payload.plan.every(day=>typeof day.day==='string'&&Array.isArray(day.exercises));
+    const validCalendar=payload.calendarRecords&&typeof payload.calendarRecords==='object'&&!Array.isArray(payload.calendarRecords);
+    if(!validPlan||!validCalendar)throw new Error('invalid');
+    if(!confirm('匯入會取代目前的課表與月曆記錄，確定繼續？'))return;
+    localStorage.setItem('lift-log-pre-import-backup',JSON.stringify({savedAt:new Date().toISOString(),plan,calendarRecords}));
+    plan=payload.plan;calendarRecords=payload.calendarRecords;
+    plan.forEach(day=>{if(day.focus){day.day=`${day.day}・${day.focus}`;day.focus=''}day.exercises.forEach(item=>{if(!item.id)item.id=crypto.randomUUID();ensureSetLogs(item)})});
+    activeDay=0;expandedIds.clear();savePlan();saveCalendar();renderWorkout();renderCalendar();alert('備份已成功匯入。');
+  }catch(error){alert('無法匯入：請選擇由 Lift Log 匯出的有效 JSON 備份檔。')}
+  finally{const input=$('#backup-file');if(input)input.value=''}
 }
 
 renderWorkout();
