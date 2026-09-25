@@ -23,13 +23,22 @@
 
     <dialog id="exercise-dialog" class="exercise-dialog">
       <form id="exercise-form" method="dialog">
-        <div class="dialog-head"><div><p class="eyebrow">編輯訓練項目</p><h2 id="dialog-title">新增動作</h2></div><button class="icon-button" value="cancel" aria-label="關閉">×</button></div>
+        <div class="dialog-head"><div><p class="eyebrow">編輯訓練項目</p><h2 id="dialog-title">新增動作</h2></div><button id="close-exercise" class="icon-button" type="button" aria-label="關閉">×</button></div>
         <label>訓練部位／類型<select id="category" required></select></label>
         <label>器材類型<select id="equipment" required disabled></select></label>
-        <label>動作<select id="exercise" required disabled></select></label>
+        <label>動作<select id="exercise" disabled></select></label>
+        <label>自訂動作名稱（選單沒有時可直接輸入）<input id="custom-exercise" type="text" maxlength="60" placeholder="例如：單手滑輪划船" /></label>
         <div class="number-grid"><label>組數<input id="sets" inputmode="numeric" type="number" min="1" max="12" required /></label><label>每組次數<input id="reps" inputmode="numeric" type="number" min="1" max="100" required /></label></div>
         <p id="selection-note" class="selection-note">請依序選擇部位、器材與動作。</p>
-        <div class="dialog-actions"><button class="secondary-button" value="cancel" type="submit">取消</button><button id="save-exercise" class="primary-button" value="default" type="submit">儲存動作</button></div>
+        <div class="dialog-actions"><button id="cancel-exercise" class="secondary-button" type="button">取消</button><button id="save-exercise" class="primary-button" type="submit">儲存動作</button></div>
+      </form>
+    </dialog>
+    <dialog id="day-dialog" class="exercise-dialog">
+      <form id="day-form">
+        <div class="dialog-head"><div><p class="eyebrow">訓練日設定</p><h2 id="day-dialog-title">編輯訓練日</h2></div><button id="close-day" class="icon-button" type="button" aria-label="關閉">×</button></div>
+        <label>日期／項目名稱<input id="day-name" type="text" maxlength="20" placeholder="例如：週六" required /></label>
+        <label>訓練內容<input id="day-focus" type="text" maxlength="40" placeholder="例如：腿＋核心" required /></label>
+        <div class="dialog-actions split-actions"><button id="delete-day" class="danger-button" type="button">刪除這天</button><span></span><button id="cancel-day" class="secondary-button" type="button">取消</button><button class="primary-button" type="submit">儲存</button></div>
       </form>
     </dialog>
     <template id="exercise-card-template"><article class="exercise-card"><div class="drag-mark" aria-hidden="true">⋮⋮</div><div class="exercise-copy"><span class="exercise-tag"></span><h3></h3><p></p></div><div class="card-actions"><button class="mini-button edit-button" type="button">編輯</button><button class="mini-button delete-button" type="button" aria-label="刪除動作">×</button></div></article></template>
