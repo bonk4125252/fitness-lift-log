@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#f6f7f3" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <title>Lift Log｜重訓課表</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="hero">
+        <p class="eyebrow">YOUR TRAINING PLAN</p>
+        <div class="title-row"><h1>Lift Log</h1><button id="reset-plan" class="text-button" type="button">還原預設</button></div>
+        <p>打造、調整並帶著你的重訓課表出發。</p>
+      </header>
+
+      <nav id="day-tabs" class="day-tabs" aria-label="選擇訓練日"></nav>
+      <section id="workout-view" aria-live="polite"></section>
+    </main>
+
+    <dialog id="exercise-dialog" class="exercise-dialog">
+      <form id="exercise-form" method="dialog">
+        <div class="dialog-head"><div><p class="eyebrow">編輯訓練項目</p><h2 id="dialog-title">新增動作</h2></div><button class="icon-button" value="cancel" aria-label="關閉">×</button></div>
+        <label>訓練部位／類型<select id="category" required></select></label>
+        <label>器材類型<select id="equipment" required disabled></select></label>
+        <label>動作<select id="exercise" required disabled></select></label>
+        <div class="number-grid"><label>組數<input id="sets" inputmode="numeric" type="number" min="1" max="12" required /></label><label>每組次數<input id="reps" inputmode="numeric" type="number" min="1" max="100" required /></label></div>
+        <p id="selection-note" class="selection-note">請依序選擇部位、器材與動作。</p>
+        <div class="dialog-actions"><button class="secondary-button" value="cancel" type="submit">取消</button><button id="save-exercise" class="primary-button" value="default" type="submit">儲存動作</button></div>
+      </form>
+    </dialog>
+    <template id="exercise-card-template"><article class="exercise-card"><div class="drag-mark" aria-hidden="true">⋮⋮</div><div class="exercise-copy"><span class="exercise-tag"></span><h3></h3><p></p></div><div class="card-actions"><button class="mini-button edit-button" type="button">編輯</button><button class="mini-button delete-button" type="button" aria-label="刪除動作">×</button></div></article></template>
+    <script src="app.js"></script>
+  </body>
+</html>
