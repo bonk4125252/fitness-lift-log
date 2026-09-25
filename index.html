@@ -43,8 +43,7 @@
     <dialog id="day-dialog" class="exercise-dialog">
       <form id="day-form">
         <div class="dialog-head"><div><p class="eyebrow">訓練日設定</p><h2 id="day-dialog-title">編輯訓練日</h2></div><button id="close-day" class="icon-button" type="button" aria-label="關閉">×</button></div>
-        <label>日期／項目名稱<input id="day-name" type="text" maxlength="20" placeholder="例如：週六" required /></label>
-        <label>訓練內容<input id="day-focus" type="text" maxlength="40" placeholder="例如：腿＋核心" required /></label>
+        <label>項目名稱<input id="day-name" type="text" maxlength="60" placeholder="例如：週六・腿＋核心" required /></label>
         <div class="dialog-actions split-actions"><button id="delete-day" class="danger-button" type="button">刪除這天</button><span></span><button id="cancel-day" class="secondary-button" type="button">取消</button><button class="primary-button" type="submit">儲存</button></div>
       </form>
     </dialog>
@@ -63,6 +62,6 @@
         <div class="set-tracker" hidden></div>
       </article>
     </template>
-    <script src="app.js?v=5"></script>
+    <script src="app.js?v=6"></script>
   </body>
 </html>

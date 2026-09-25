@@ -45,7 +45,10 @@ function ensureSetLogs(item){
   item.setLogs=Array.from({length:Number(item.sets)||1},(_,index)=>({done:Boolean(old[index]?.done),weight:String(old[index]?.weight??'')}));
   return item.setLogs;
 }
-plan.forEach(day=>day.exercises.forEach(ensureSetLogs));
+plan.forEach(day=>{
+  if(day.focus){day.day=`${day.day}・${day.focus}`;day.focus=''}
+  day.exercises.forEach(ensureSetLogs);
+});
 function savePlan(){localStorage.setItem(PLAN_KEY,JSON.stringify(plan))}
 function saveCalendar(){localStorage.setItem(CALENDAR_KEY,JSON.stringify(calendarRecords))}
 savePlan();
@@ -67,13 +70,13 @@ function renderWorkout(){
     group.className=`day-tab-group ${index===activeDay?'active':''}`;
     const button=document.createElement('button');
     button.className='day-tab';
-    button.textContent=`${day.day}・${day.focus}`;
+    button.textContent=day.day;
     button.onclick=()=>{activeDay=index;renderWorkout()};
     group.append(button);
     if(plan.length>1){
       const deleteButton=document.createElement('button');
       deleteButton.className='day-action day-delete';deleteButton.type='button';deleteButton.textContent='×';
-      deleteButton.setAttribute('aria-label',`刪除 ${day.day}・${day.focus}`);
+      deleteButton.setAttribute('aria-label',`刪除 ${day.day}`);
       deleteButton.onclick=()=>deleteDay(index);
       group.append(deleteButton);
     }
@@ -86,7 +89,7 @@ function renderWorkout(){
   workoutView.innerHTML='';
   const head=document.createElement('div');
   head.className='workout-heading';
-  head.innerHTML=`<div><h2>${escapeHtml(day.day)}｜${escapeHtml(day.focus)}</h2><p>${day.exercises.length} 個訓練動作</p></div><button class="mini-button" id="edit-day" type="button">編輯訓練日</button>`;
+  head.innerHTML=`<div><h2>${escapeHtml(day.day)}</h2><p>${day.exercises.length} 個訓練動作</p></div><button class="mini-button" id="edit-day" type="button">編輯訓練日</button>`;
   workoutView.append(head);$('#edit-day').onclick=()=>openDayDialog(false);
 
   const list=document.createElement('div');list.className='exercise-list';
@@ -142,16 +145,16 @@ $('#exercise-form').addEventListener('submit',event=>{
   savePlan();exerciseDialog.close();renderWorkout();
 });
 
-function openDayDialog(isNew){addingDay=isNew;$('#day-dialog-title').textContent=isNew?'新增訓練日':'編輯訓練日';$('#day-name').value=isNew?'':plan[activeDay].day;$('#day-focus').value=isNew?'':plan[activeDay].focus;$('#delete-day').hidden=isNew||plan.length===1;dayDialog.showModal()}
+function openDayDialog(isNew){addingDay=isNew;$('#day-dialog-title').textContent=isNew?'新增訓練日':'編輯訓練日';$('#day-name').value=isNew?'':plan[activeDay].day;$('#delete-day').hidden=isNew||plan.length===1;dayDialog.showModal()}
 function closeDay(){dayDialog.close()}
 function deleteDay(index){
   const day=plan[index];
-  if(confirm(`刪除「${day.day}・${day.focus}」及其中所有動作？`)){
+  if(confirm(`刪除「${day.day}」及其中所有動作？`)){
     plan.splice(index,1);if(activeDay>=plan.length)activeDay=plan.length-1;else if(index<activeDay)activeDay-=1;savePlan();if(dayDialog.open)dayDialog.close();renderWorkout();
   }
 }
 $('#close-day').onclick=closeDay;$('#cancel-day').onclick=closeDay;
-$('#day-form').addEventListener('submit',event=>{event.preventDefault();const data={day:$('#day-name').value.trim(),focus:$('#day-focus').value.trim()};if(addingDay){plan.push({...data,exercises:[]});activeDay=plan.length-1}else Object.assign(plan[activeDay],data);savePlan();dayDialog.close();renderWorkout()});
+$('#day-form').addEventListener('submit',event=>{event.preventDefault();const name=$('#day-name').value.trim();if(addingDay){plan.push({day:name,focus:'',exercises:[]});activeDay=plan.length-1}else{plan[activeDay].day=name;plan[activeDay].focus=''}savePlan();dayDialog.close();renderWorkout()});
 $('#delete-day').onclick=()=>deleteDay(activeDay);
 
 function openCompleteDialog(){
@@ -159,7 +162,7 @@ function openCompleteDialog(){
   $('#complete-date').value=localDateKey(new Date());
   const total=day.exercises.reduce((sum,item)=>sum+ensureSetLogs(item).length,0);
   const done=day.exercises.reduce((sum,item)=>sum+item.setLogs.filter(log=>log.done).length,0);
-  $('#complete-summary').innerHTML=`<strong>${escapeHtml(day.day)}｜${escapeHtml(day.focus)}</strong><br>${day.exercises.length} 個動作，共完成 ${done}／${total} 組`;
+  $('#complete-summary').innerHTML=`<strong>${escapeHtml(day.day)}</strong><br>${day.exercises.length} 個動作，共完成 ${done}／${total} 組`;
   completeDialog.showModal();
 }
 function closeComplete(){completeDialog.close()}
@@ -195,7 +198,7 @@ function renderCalendarDetail(date){
   const detail=document.createElement('div');detail.className='calendar-detail';const records=calendarRecords[date]||[];
   detail.innerHTML=`<h3>${escapeHtml(date)}</h3><p>${records.length?`${records.length} 筆訓練記錄`:'這一天尚無訓練記錄'}</p>`;
   records.forEach(record=>{
-    const session=document.createElement('div');session.className='record-session';const title=document.createElement('h4');title.textContent=`${record.day}｜${record.focus}`;session.append(title);
+    const session=document.createElement('div');session.className='record-session';const title=document.createElement('h4');title.textContent=record.focus?`${record.day}｜${record.focus}`:record.day;session.append(title);
     record.exercises.forEach(exercise=>{const row=document.createElement('div');row.className='record-exercise';const sets=exercise.sets.map((set,index)=>`${set.done?'✓':'○'} 第${index+1}組${set.weight?` ${set.weight}kg`:''}`).join(' · ');row.innerHTML=`<strong>${escapeHtml(exercise.name)}</strong><div class="record-sets">${escapeHtml(sets)} · 每組 ${exercise.reps} 下</div>`;session.append(row)});
     detail.append(session);
   });
