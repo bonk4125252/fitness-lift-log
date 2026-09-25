@@ -69,11 +69,7 @@ function renderWorkout(){
     button.className='day-tab';
     button.textContent=`${day.day}・${day.focus}`;
     button.onclick=()=>{activeDay=index;renderWorkout()};
-    const editButton=document.createElement('button');
-    editButton.className='day-action';editButton.type='button';editButton.textContent='編輯';
-    editButton.setAttribute('aria-label',`編輯 ${day.day}・${day.focus}`);
-    editButton.onclick=()=>{activeDay=index;renderWorkout();openDayDialog(false)};
-    group.append(button,editButton);
+    group.append(button);
     if(plan.length>1){
       const deleteButton=document.createElement('button');
       deleteButton.className='day-action day-delete';deleteButton.type='button';deleteButton.textContent='×';
