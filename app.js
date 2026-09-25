@@ -32,11 +32,29 @@ function save(){
 function render(){
   dayTabs.innerHTML='';
   plan.forEach((day,index)=>{
+    const group=document.createElement('div');
+    group.className=`day-tab-group ${index===activeDay?'active':''}`;
     const button=document.createElement('button');
-    button.className=`day-tab ${index===activeDay?'active':''}`;
+    button.className='day-tab';
     button.textContent=`${day.day}・${day.focus}`;
     button.onclick=()=>{activeDay=index;render()};
-    dayTabs.append(button);
+    const editButton=document.createElement('button');
+    editButton.className='day-action';
+    editButton.type='button';
+    editButton.textContent='編輯';
+    editButton.setAttribute('aria-label',`編輯 ${day.day}・${day.focus}`);
+    editButton.onclick=()=>{activeDay=index;render();openDayDialog(false)};
+    group.append(button,editButton);
+    if(plan.length>1){
+      const deleteButton=document.createElement('button');
+      deleteButton.className='day-action day-delete';
+      deleteButton.type='button';
+      deleteButton.textContent='×';
+      deleteButton.setAttribute('aria-label',`刪除 ${day.day}・${day.focus}`);
+      deleteButton.onclick=()=>deleteDay(index);
+      group.append(deleteButton);
+    }
+    dayTabs.append(group);
   });
   const addDay=document.createElement('button');
   addDay.className='day-tab add-day';
@@ -147,6 +165,17 @@ function openDayDialog(isNew){
   dayDialog.showModal();
 }
 function closeDay(){dayDialog.close()}
+function deleteDay(index){
+  const day=plan[index];
+  if(confirm(`刪除「${day.day}・${day.focus}」及其中所有動作？`)){
+    plan.splice(index,1);
+    if(activeDay>=plan.length) activeDay=plan.length-1;
+    else if(index<activeDay) activeDay-=1;
+    save();
+    if(dayDialog.open) dayDialog.close();
+    render();
+  }
+}
 $('#close-day').onclick=closeDay;
 $('#cancel-day').onclick=closeDay;
 $('#day-form').addEventListener('submit',event=>{
@@ -161,12 +190,7 @@ $('#day-form').addEventListener('submit',event=>{
   save();dayDialog.close();render();
 });
 $('#delete-day').onclick=()=>{
-  const day=plan[activeDay];
-  if(confirm(`刪除「${day.day}・${day.focus}」及其中所有動作？`)){
-    plan.splice(activeDay,1);
-    activeDay=Math.max(0,activeDay-1);
-    save();dayDialog.close();render();
-  }
+  deleteDay(activeDay);
 };
 
 $('#reset-plan').onclick=()=>{

@@ -1,5 +1,12 @@
 :root { color-scheme: light; --ink:#1b211c; --muted:#697168; --line:#dde1d9; --paper:#f6f7f3; --card:#fff; --accent:#496847; --accent-pale:#dfe9dc; --danger:#a6463d; font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Noto Sans TC",sans-serif; }
 .day-tab.add-day{border-style:dashed;color:var(--accent)}
+.day-tab-group{display:flex;flex:0 0 auto;align-items:center;border:1px solid var(--line);border-radius:99px;overflow:hidden;background:transparent}
+.day-tab-group .day-tab{border:0;border-radius:0;padding-right:11px}
+.day-tab-group.active{background:var(--ink);border-color:var(--ink)}
+.day-tab-group.active .day-tab{background:transparent;color:#fff}
+.day-action{align-self:stretch;border:0;border-left:1px solid var(--line);background:#edf1ea;color:var(--accent);padding:0 9px;font-size:.72rem;font-weight:750}
+.day-tab-group.active .day-action{border-left-color:#525a53;background:#303832;color:#dce9d9}
+.day-delete{font-size:1.1rem;color:var(--danger);padding:0 8px}
 .dialog-actions{align-items:center}
 .split-actions{display:grid;grid-template-columns:auto 1fr auto auto}
 .danger-button{border-radius:11px;padding:11px 15px;border:1px solid #e6c5c1;background:#fff;color:var(--danger);font-weight:750}
